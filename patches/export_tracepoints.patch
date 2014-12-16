@@ -1,0 +1,90 @@
+Subject: tracing/events: Export trace symbols required for osjitter tool
+
+All tracepoint symbols could be used by modules back when I wrote
+the osjitter tool. Now they need to be explicitely exported, we
+should probably just build the tool into ftrace directly.
+
+Signed-off-by: Anton Blanchard <anton@samba.org>
+---
+
+Index: linux/kernel/workqueue.c
+===================================================================
+--- linux.orig/kernel/workqueue.c
++++ linux/kernel/workqueue.c
+@@ -328,6 +328,9 @@ static void copy_workqueue_attrs(struct
+ #define CREATE_TRACE_POINTS
+ #include <trace/events/workqueue.h>
+ 
++EXPORT_TRACEPOINT_SYMBOL_GPL(workqueue_execute_end);
++EXPORT_TRACEPOINT_SYMBOL_GPL(workqueue_execute_start);
++
+ #define assert_rcu_or_pool_mutex()					\
+ 	rcu_lockdep_assert(rcu_read_lock_sched_held() ||		\
+ 			   lockdep_is_held(&wq_pool_mutex),		\
+Index: linux/kernel/sched/core.c
+===================================================================
+--- linux.orig/kernel/sched/core.c
++++ linux/kernel/sched/core.c
+@@ -90,6 +90,8 @@
+ #define CREATE_TRACE_POINTS
+ #include <trace/events/sched.h>
+ 
++EXPORT_TRACEPOINT_SYMBOL_GPL(sched_switch);
++
+ void start_bandwidth_timer(struct hrtimer *period_timer, ktime_t period)
+ {
+ 	unsigned long delta;
+Index: linux/kernel/softirq.c
+===================================================================
+--- linux.orig/kernel/softirq.c
++++ linux/kernel/softirq.c
+@@ -30,6 +30,13 @@
+ #define CREATE_TRACE_POINTS
+ #include <trace/events/irq.h>
+ 
++EXPORT_TRACEPOINT_SYMBOL_GPL(irq_handler_entry);
++EXPORT_TRACEPOINT_SYMBOL_GPL(irq_handler_exit);
++EXPORT_TRACEPOINT_SYMBOL_GPL(softirq_entry);
++EXPORT_TRACEPOINT_SYMBOL_GPL(softirq_exit);
++EXPORT_TRACEPOINT_SYMBOL_GPL(tasklet_entry);
++EXPORT_TRACEPOINT_SYMBOL_GPL(tasklet_exit);
++
+ /*
+    - No shared variables, all the data are CPU local.
+    - If a softirq needs serialization, let it serialize itself
+Index: linux/kernel/time/timer.c
+===================================================================
+--- linux.orig/kernel/time/timer.c
++++ linux/kernel/time/timer.c
+@@ -52,6 +52,11 @@
+ #define CREATE_TRACE_POINTS
+ #include <trace/events/timer.h>
+ 
++EXPORT_TRACEPOINT_SYMBOL_GPL(hrtimer_expire_entry);
++EXPORT_TRACEPOINT_SYMBOL_GPL(hrtimer_expire_exit);
++EXPORT_TRACEPOINT_SYMBOL_GPL(timer_expire_entry);
++EXPORT_TRACEPOINT_SYMBOL_GPL(timer_expire_exit);
++
+ __visible u64 jiffies_64 __cacheline_aligned_in_smp = INITIAL_JIFFIES;
+ 
+ EXPORT_SYMBOL(jiffies_64);
+Index: linux/arch/powerpc/kernel/irq.c
+===================================================================
+--- linux.orig/arch/powerpc/kernel/irq.c
++++ linux/arch/powerpc/kernel/irq.c
+@@ -76,6 +76,15 @@
+ #define CREATE_TRACE_POINTS
+ #include <asm/trace.h>
+ 
++EXPORT_TRACEPOINT_SYMBOL(timer_interrupt_entry);
++EXPORT_TRACEPOINT_SYMBOL(timer_interrupt_exit);
++EXPORT_TRACEPOINT_SYMBOL(irq_entry);
++EXPORT_TRACEPOINT_SYMBOL(irq_exit);
++EXPORT_TRACEPOINT_SYMBOL(hcall_entry);
++EXPORT_TRACEPOINT_SYMBOL(hcall_exit);
++EXPORT_TRACEPOINT_SYMBOL(opal_entry);
++EXPORT_TRACEPOINT_SYMBOL(opal_exit);
++
+ DEFINE_PER_CPU_SHARED_ALIGNED(irq_cpustat_t, irq_stat);
+ EXPORT_PER_CPU_SYMBOL(irq_stat);
+ 
