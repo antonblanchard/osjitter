@@ -90,7 +90,7 @@ static DEFINE_PER_CPU(unsigned long, lost_samples);
 static void log_lost_samples(void)
 {
 	unsigned long long buf[2];
-	unsigned long *lost = &__get_cpu_var(lost_samples);
+	unsigned long *lost = this_cpu_ptr(&lost_samples);
 
 	if (*lost) {
 		buf[0] = FORMAT_HEADER_0(get_cycles());
@@ -106,7 +106,7 @@ static void lost_sample(void)
 	unsigned long flags;
 
 	local_irq_save(flags);
-	__get_cpu_var(lost_samples)++;
+	__this_cpu_inc(lost_samples);
 	local_irq_restore(flags);
 }
 
