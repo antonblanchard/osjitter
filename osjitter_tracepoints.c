@@ -286,7 +286,8 @@ static void probe_opal_exit(void *ignore, unsigned long opcode,
 
 #endif
 
-static void probe_sched_switch(void *ignore, struct task_struct *prev,
+static void probe_sched_switch(void *ignore, bool preempt,
+			       struct task_struct *prev,
 			       struct task_struct *next)
 {
 	logit_comm(EVENT_CONTEXT_SWITCH, next->pid, next->comm);
