@@ -7,11 +7,11 @@ should probably just build the tool into ftrace directly.
 Signed-off-by: Anton Blanchard <anton@samba.org>
 ---
 
-Index: linux/kernel/workqueue.c
+Index: linux.junk/kernel/workqueue.c
 ===================================================================
---- linux.orig/kernel/workqueue.c
-+++ linux/kernel/workqueue.c
-@@ -328,6 +328,9 @@ static void copy_workqueue_attrs(struct
+--- linux.junk.orig/kernel/workqueue.c
++++ linux.junk/kernel/workqueue.c
+@@ -354,6 +354,9 @@ static void workqueue_sysfs_unregister(s
  #define CREATE_TRACE_POINTS
  #include <trace/events/workqueue.h>
  
@@ -19,25 +19,12 @@ Index: linux/kernel/workqueue.c
 +EXPORT_TRACEPOINT_SYMBOL_GPL(workqueue_execute_start);
 +
  #define assert_rcu_or_pool_mutex()					\
- 	rcu_lockdep_assert(rcu_read_lock_sched_held() ||		\
- 			   lockdep_is_held(&wq_pool_mutex),		\
-Index: linux/kernel/sched/core.c
+ 	RCU_LOCKDEP_WARN(!rcu_read_lock_sched_held() &&			\
+ 			 !lockdep_is_held(&wq_pool_mutex),		\
+Index: linux.junk/kernel/softirq.c
 ===================================================================
---- linux.orig/kernel/sched/core.c
-+++ linux/kernel/sched/core.c
-@@ -90,6 +90,8 @@
- #define CREATE_TRACE_POINTS
- #include <trace/events/sched.h>
- 
-+EXPORT_TRACEPOINT_SYMBOL_GPL(sched_switch);
-+
- void start_bandwidth_timer(struct hrtimer *period_timer, ktime_t period)
- {
- 	unsigned long delta;
-Index: linux/kernel/softirq.c
-===================================================================
---- linux.orig/kernel/softirq.c
-+++ linux/kernel/softirq.c
+--- linux.junk.orig/kernel/softirq.c
++++ linux.junk/kernel/softirq.c
 @@ -30,6 +30,13 @@
  #define CREATE_TRACE_POINTS
  #include <trace/events/irq.h>
@@ -52,11 +39,11 @@ Index: linux/kernel/softirq.c
  /*
     - No shared variables, all the data are CPU local.
     - If a softirq needs serialization, let it serialize itself
-Index: linux/kernel/time/timer.c
+Index: linux.junk/kernel/time/timer.c
 ===================================================================
---- linux.orig/kernel/time/timer.c
-+++ linux/kernel/time/timer.c
-@@ -52,6 +52,11 @@
+--- linux.junk.orig/kernel/time/timer.c
++++ linux.junk/kernel/time/timer.c
+@@ -54,6 +54,11 @@
  #define CREATE_TRACE_POINTS
  #include <trace/events/timer.h>
  
@@ -68,13 +55,13 @@ Index: linux/kernel/time/timer.c
  __visible u64 jiffies_64 __cacheline_aligned_in_smp = INITIAL_JIFFIES;
  
  EXPORT_SYMBOL(jiffies_64);
-Index: linux/arch/powerpc/kernel/irq.c
+Index: linux.junk/arch/powerpc/kernel/irq.c
 ===================================================================
---- linux.orig/arch/powerpc/kernel/irq.c
-+++ linux/arch/powerpc/kernel/irq.c
-@@ -76,6 +76,15 @@
- #define CREATE_TRACE_POINTS
+--- linux.junk.orig/arch/powerpc/kernel/irq.c
++++ linux.junk/arch/powerpc/kernel/irq.c
+@@ -78,6 +78,15 @@
  #include <asm/trace.h>
+ #include <asm/cpu_has_feature.h>
  
 +EXPORT_TRACEPOINT_SYMBOL(timer_interrupt_entry);
 +EXPORT_TRACEPOINT_SYMBOL(timer_interrupt_exit);
@@ -87,4 +74,17 @@ Index: linux/arch/powerpc/kernel/irq.c
 +
  DEFINE_PER_CPU_SHARED_ALIGNED(irq_cpustat_t, irq_stat);
  EXPORT_PER_CPU_SYMBOL(irq_stat);
+ 
+Index: linux.junk/kernel/sched/core.c
+===================================================================
+--- linux.junk.orig/kernel/sched/core.c
++++ linux.junk/kernel/sched/core.c
+@@ -91,6 +91,8 @@
+ #define CREATE_TRACE_POINTS
+ #include <trace/events/sched.h>
+ 
++EXPORT_TRACEPOINT_SYMBOL_GPL(sched_switch);
++
+ DEFINE_MUTEX(sched_domains_mutex);
+ DEFINE_PER_CPU_SHARED_ALIGNED(struct rq, runqueues);
  

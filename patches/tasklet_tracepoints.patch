@@ -11,11 +11,11 @@ Example ftrace output:
 Signed-off-by: Anton Blanchard <anton@samba.org>
 ---
 
-Index: linux/kernel/softirq.c
+Index: linux.junk/kernel/softirq.c
 ===================================================================
---- linux.orig/kernel/softirq.c
-+++ linux/kernel/softirq.c
-@@ -498,7 +498,9 @@ static void tasklet_action(struct softir
+--- linux.junk.orig/kernel/softirq.c
++++ linux.junk/kernel/softirq.c
+@@ -516,7 +516,9 @@ static void tasklet_action(struct softir
  				if (!test_and_clear_bit(TASKLET_STATE_SCHED,
  							&t->state))
  					BUG();
@@ -25,7 +25,7 @@ Index: linux/kernel/softirq.c
  				tasklet_unlock(t);
  				continue;
  			}
-@@ -534,7 +536,9 @@ static void tasklet_hi_action(struct sof
+@@ -552,7 +554,9 @@ static void tasklet_hi_action(struct sof
  				if (!test_and_clear_bit(TASKLET_STATE_SCHED,
  							&t->state))
  					BUG();
@@ -35,11 +35,11 @@ Index: linux/kernel/softirq.c
  				tasklet_unlock(t);
  				continue;
  			}
-Index: linux/include/trace/events/irq.h
+Index: linux.junk/include/trace/events/irq.h
 ===================================================================
---- linux.orig/include/trace/events/irq.h
-+++ linux/include/trace/events/irq.h
-@@ -144,6 +144,54 @@ DEFINE_EVENT(softirq, softirq_raise,
+--- linux.junk.orig/include/trace/events/irq.h
++++ linux.junk/include/trace/events/irq.h
+@@ -159,6 +159,54 @@ DEFINE_EVENT(softirq, softirq_raise,
  	TP_ARGS(vec_nr)
  );
  
