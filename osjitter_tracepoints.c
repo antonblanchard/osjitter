@@ -256,6 +256,7 @@ static void probe_tasklet_exit(void *ignore, struct tasklet_struct *t)
 #endif
 
 #ifdef CONFIG_PPC64
+#ifndef NO_PHYP_TRACEPOINTS
 static void probe_hcall_entry(void *ignore, unsigned long opcode,
 			      unsigned long *args)
 {
@@ -271,6 +272,7 @@ static void probe_hcall_exit(void *ignore, unsigned long opcode,
 	if (opcode != 224)
 		logit(EVENT_HCALL_EXIT, opcode);
 }
+#endif
 
 static void probe_opal_entry(void *ignore, unsigned long opcode,
 			     unsigned long *args)
@@ -382,8 +384,10 @@ static int __init trace_init(void)
 #endif
 
 #ifdef CONFIG_PPC64
+#ifndef NO_PHYP_TRACEPOINTS
 	WARN_ON(register_trace_hcall_entry(probe_hcall_entry, NULL));
 	WARN_ON(register_trace_hcall_exit(probe_hcall_exit, NULL));
+#endif
 
 	WARN_ON(register_trace_opal_entry(probe_opal_entry, NULL));
 	WARN_ON(register_trace_opal_exit(probe_opal_exit, NULL));
@@ -428,8 +432,10 @@ static void __exit trace_exit(void)
 #endif
 
 #ifdef CONFIG_PPC64
+#ifndef NO_PHYP_TRACEPOINTS
 	unregister_trace_hcall_entry(probe_hcall_entry, NULL);
 	unregister_trace_hcall_exit(probe_hcall_exit, NULL);
+#endif
 
 	unregister_trace_opal_entry(probe_opal_entry, NULL);
 	unregister_trace_opal_exit(probe_opal_exit, NULL);
