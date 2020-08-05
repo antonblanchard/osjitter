@@ -1,4 +1,7 @@
-Subject: tracing/events: Add tasklet tracepoints
+From d5bd614451694ed4e1aa4dbb94f75044caee57eb Mon Sep 17 00:00:00 2001
+From: Anton Blanchard <anton@ozlabs.org>
+Date: Wed, 5 Aug 2020 11:22:44 +1000
+Subject: [PATCH 2/2] tracing/events: Add tasklet tracepoints
 
 Add tracepoints for tasklets. We add entry and exit tracepoints so we can
 calculate tasklet latency.
@@ -8,38 +11,17 @@ Example ftrace output:
 <idle>-0     [000]   327.349213: tasklet_entry: func=.rpavscsi_task
 <idle>-0     [000]   327.349217: tasklet_exit: func=.rpavscsi_task
 
-Signed-off-by: Anton Blanchard <anton@samba.org>
+Signed-off-by: Anton Blanchard <anton@ozlabs.org>
 ---
+ include/trace/events/irq.h | 48 ++++++++++++++++++++++++++++++++++++++
+ kernel/softirq.c           |  2 ++
+ 2 files changed, 50 insertions(+)
 
-Index: linux.junk/kernel/softirq.c
-===================================================================
---- linux.junk.orig/kernel/softirq.c
-+++ linux.junk/kernel/softirq.c
-@@ -516,7 +516,9 @@ static void tasklet_action(struct softir
- 				if (!test_and_clear_bit(TASKLET_STATE_SCHED,
- 							&t->state))
- 					BUG();
-+				trace_tasklet_entry(t);
- 				t->func(t->data);
-+				trace_tasklet_exit(t);
- 				tasklet_unlock(t);
- 				continue;
- 			}
-@@ -552,7 +554,9 @@ static void tasklet_hi_action(struct sof
- 				if (!test_and_clear_bit(TASKLET_STATE_SCHED,
- 							&t->state))
- 					BUG();
-+				trace_tasklet_entry(t);
- 				t->func(t->data);
-+				trace_tasklet_exit(t);
- 				tasklet_unlock(t);
- 				continue;
- 			}
-Index: linux.junk/include/trace/events/irq.h
-===================================================================
---- linux.junk.orig/include/trace/events/irq.h
-+++ linux.junk/include/trace/events/irq.h
-@@ -159,6 +159,54 @@ DEFINE_EVENT(softirq, softirq_raise,
+diff --git a/include/trace/events/irq.h b/include/trace/events/irq.h
+index eeceafaaea4c..3c735b7e53bf 100644
+--- a/include/trace/events/irq.h
++++ b/include/trace/events/irq.h
+@@ -160,6 +160,54 @@ DEFINE_EVENT(softirq, softirq_raise,
  	TP_ARGS(vec_nr)
  );
  
@@ -94,3 +76,23 @@ Index: linux.junk/include/trace/events/irq.h
  #endif /*  _TRACE_IRQ_H */
  
  /* This part must be outside protection */
+diff --git a/kernel/softirq.c b/kernel/softirq.c
+index 8cc85a0daba1..b8a7237d8e72 100644
+--- a/kernel/softirq.c
++++ b/kernel/softirq.c
+@@ -560,10 +560,12 @@ static void tasklet_action_common(struct softirq_action *a,
+ 				if (!test_and_clear_bit(TASKLET_STATE_SCHED,
+ 							&t->state))
+ 					BUG();
++				trace_tasklet_entry(t);
+ 				if (t->use_callback)
+ 					t->callback(t);
+ 				else
+ 					t->func(t->data);
++				trace_tasklet_exit(t);
+ 				tasklet_unlock(t);
+ 				continue;
+ 			}
+-- 
+2.26.2
+
